@@ -6,3 +6,4 @@ bin
 *.txt
 .cache
 compile_commands.json
+netpong

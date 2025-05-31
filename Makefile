@@ -23,23 +23,30 @@ SRCDIR	=	src
 OBJDIR	=	obj
 INCDIR	=	inc
 
-FILES	=	
+PONGDIR	=	pong
+SERVDIR	=	server
+
+FILES	=	main.c \
+			utils.c \
+			$(PONGDIR)/pong.c \
+			$(SERVDIR)/server.c
 
 SRCS	=	$(addprefix $(SRCDIR)/, $(FILES))
 OBJS	=	$(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
 
 all: $(NAME)
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJDIR) $(OBJS)
 	@printf "\e[38;5;119;1mNETPONG >\e[m Creating %s\n" $@
-	@$(CC) $(CFLAGS) $^ -o $@
+	@$(CC) $(CFLAGS) $(OBJS) -o $@
 	@printf "\e[38;5;119;1mNETPONG >\e[m \e[1mDone!\e[m\n"
 
 $(OBJDIR):
 	@printf "\e[38;5;119;1mNETPONG >\e[m Creating objdirs\n"
-	@mkdir -p $(OBJDIR)
+	@mkdir -p $(OBJDIR)/$(PONGDIR)
+	@mkdir -p $(OBJDIR)/$(SERVDIR)
 
-$(OBJDIR)/%.o: $(OBJDIR) $(SRCDIR)/%.c
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
 	@printf "\e[38;5;119;1mNETPONG >\e[m Compiling %s\n" $<
 	@$(CC) $(CFLAGS) -c $< -o $@
 
