@@ -31,7 +31,26 @@ typedef double		f64;
 # define EXEC_NAME "netpong"
 #endif
 
-#define SGR_FATAL	"\x1b[1;38;5;124m"
+#ifndef SGR_FATAL
+# define SGR_FATAL	"\x1b[1;38;5;124m"
+#endif
+
+#ifndef SGR_ERROR
+# define SGR_ERROR	"\x1b[1;38;5;196m"
+#endif
+
+#ifndef SGR_WARN
+# define SGR_WARN	"\x1b[1;38;5;202m"
+#endif
+
+#ifndef SGR_INFO
+# define SGR_INFO	"\x1b[1;38;5;99m"
+#endif
+
+#ifndef SGR_DEBUG
+# define SGR_DEBUG	"\x1b[1;38;5;85m"
+#endif
+
 #define SGR_RESET	"\x1b[m"
 
 #define PROTOCOL_VERSION	0

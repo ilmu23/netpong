@@ -12,6 +12,12 @@
 #include "defs.h"
 
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 
 [[gnu::noreturn]] void	die(const char *msg);
+
+u8	error(const char *fmt, ...);
+u8	warn(const char *fmt, ...);
+u8	info(const char *fmt, ...);
+u8	debug(const char *fmt, ...);
