@@ -11,13 +11,20 @@
 
 #include "data.h"
 
+#include <time.h>
 #include <pthread.h>
 
 #define GAME_PLAYER_1	0x1U
 #define GAME_PLAYER_2	0x2U
 
+#define GAME_TICKRATE	1000U
+
 #define GAME_FIELD_WIDTH	80.0f
 #define GAME_FIELD_HEIGHT	20.0f
+
+#define	GAME_BALL_RADIUS	0.5f
+#define GAME_PADDLE_HEIGHT	1.5f
+#define GAME_BALL_MAX_ANGLE	45.0f
 
 #define GAME_UPDATE_ALLOWED		1
 #define GAME_UPDATE_FORBIDDEN	0

@@ -27,6 +27,8 @@ typedef double		f64;
 #define lock_game(game_id)		(pthread_mutex_lock(&state_locks[game_id]))
 #define unlock_game(game_id)	(pthread_mutex_unlock(&state_locks[game_id]))
 
+#define	rand_range(min, max)	(rand() % (max - min + 1) + min)
+
 #ifndef EXEC_NAME
 # define EXEC_NAME "netpong"
 #endif
