@@ -130,11 +130,12 @@ static inline void	_send_msg(const i32 sfd, const u8 msg_type, const u8 body[18]
 
 static inline i32	_connect_player(const char *addr, const u16 port) {
 	size_t	i;
-	char	buf[6] = "\0\0\0\0\0\0";
+	char	buf[6];
 	u16		_port;
 
 	for (i = 1, _port = port; _port > 9; _port /= 10, i++)
 		;
+	buf[i] = '\0';
 	for (_port = port; i; _port /= 10)
 		buf[--i] = _port % 10 + '0';
 	return _connect(addr, buf);
