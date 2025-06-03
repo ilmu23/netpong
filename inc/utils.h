@@ -18,7 +18,7 @@
 
 [[gnu::noreturn]] void	die(const char *msg);
 
-u8	error(const char *fmt, ...);
-u8	warn(const char *fmt, ...);
-u8	info(const char *fmt, ...);
-u8	debug(const char *fmt, ...);
+u8	error([[maybe_unused]] const char *fmt, ...);
+u8	warn([[maybe_unused]] const char *fmt, ...);
+u8	info([[maybe_unused]] const char *fmt, ...);
+u8	debug([[maybe_unused]] const char *fmt, ...);

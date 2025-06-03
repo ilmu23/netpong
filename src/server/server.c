@@ -85,6 +85,7 @@ void	send_message(const u8 game_id, const u8 message_type) {
 		case MESSAGE_SERVER_GAME_OVER:
 			msg.length = 1;
 			msg.body[0] = (games[game_id].state.score.p1 == GAME_SCORE_MAX) ? 1 : 2;
+			info("Game %hhu: Game over, winner: Player %hhu", game_id, msg.body[0]);
 			break ;
 		case MESSAGE_SERVER_STATE_UPDATE:
 			game = &games[game_id].state;

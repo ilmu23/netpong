@@ -11,9 +11,14 @@ NAME		=	netpong_server
 TEST_CLIENT	=	test_client
 
 BUILD	=	fsan
+ifeq ("$(BUILD)", "normal")
+	LOG_LEVEL	=	3
+else
+	LOG_LEVEL	=	4
+endif
 
 CC				=	gcc
-cflags.common	=	-Wall -Wextra -Werror -Wpedantic -pedantic-errors -std=gnu2x -I$(INCDIR)
+cflags.common	=	-Wall -Wextra -Werror -Wpedantic -pedantic-errors -std=gnu2x -DLOG_LEVEL=$(LOG_LEVEL) -I$(INCDIR)
 cflags.debug	=	-g
 cflags.fsan		=	$(cflags.debug) -fsanitize=address,undefined
 cflags.normal	=	-s -O1

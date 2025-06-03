@@ -33,6 +33,16 @@ typedef double		f64;
 # define EXEC_NAME "netpong_server"
 #endif
 
+#define LOG_LEVEL_FATAL	0
+#define LOG_LEVEL_ERROR	1
+#define LOG_LEVEL_WARN	2
+#define LOG_LEVEL_INFO	3
+#define LOG_LEVEL_DEBUG	4
+
+#ifndef LOG_LEVEL
+# define LOG_LEVEL LOG_LEVEL_INFO
+#endif
+
 #ifndef SGR_FATAL
 # define SGR_FATAL	"\x1b[1;38;5;124m"
 #endif

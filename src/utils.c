@@ -18,39 +18,47 @@ static pthread_mutex_t	log_lock = PTHREAD_MUTEX_INITIALIZER;
 	exit(1);
 }
 
-u8	error(const char *fmt, ...) {
+u8	error([[maybe_unused]] const char *fmt, ...) {
+#if LOG_LEVEL >= LOG_LEVEL_ERROR
 	va_list	args;
 
 	va_start(args, fmt);
 	_print_message(fmt, args, SGR_ERROR);
 	va_end(args);
+#endif
 	return 0;
 }
 
-u8	warn(const char *fmt, ...) {
+u8	warn([[maybe_unused]] const char *fmt, ...) {
+#if LOG_LEVEL >= LOG_LEVEL_WARN
 	va_list	args;
 
 	va_start(args, fmt);
 	_print_message(fmt, args, SGR_WARN);
 	va_end(args);
+#endif
 	return 0;
 }
 
-u8	info(const char *fmt, ...) {
+u8	info([[maybe_unused]] const char *fmt, ...) {
+#if LOG_LEVEL >= LOG_LEVEL_INFO
 	va_list	args;
 
 	va_start(args, fmt);
 	_print_message(fmt, args, SGR_INFO);
 	va_end(args);
+#endif
 	return 0;
 }
 
-u8	debug(const char *fmt, ...) {
+u8	debug([[maybe_unused]] const char *fmt, ...) {
+#if LOG_LEVEL >= LOG_LEVEL_DEBUG
 	va_list	args;
 
 	va_start(args, fmt);
 	_print_message(fmt, args, SGR_DEBUG);
 	va_end(args);
+#endif
 	return 0;
 }
 
