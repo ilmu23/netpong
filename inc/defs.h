@@ -30,7 +30,7 @@ typedef double		f64;
 #define	rand_range(min, max)	(rand() % (max - min + 1) + min)
 
 #ifndef EXEC_NAME
-# define EXEC_NAME "netpong"
+# define EXEC_NAME "netpong_server"
 #endif
 
 #ifndef SGR_FATAL

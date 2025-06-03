@@ -12,11 +12,11 @@
 #include "defs.h"
 
 typedef enum __direction {
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT,
-	STOP
+	UP = 0,
+	DOWN = 1,
+	LEFT = 2,
+	RIGHT = 3,
+	STOP = 4
 }	direction;
 
 typedef struct __state {

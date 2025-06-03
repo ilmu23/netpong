@@ -7,17 +7,20 @@
 ##
 ## <<Makefile>>
 
-NAME	=	netpong
+NAME		=	netpong_server
+TEST_CLIENT	=	test_client
 
 BUILD	=	fsan
 
 CC				=	gcc
-cflags.common	=	-Wall -Wextra -Werror -Wpedantic -pedantic-errors -std=gnu23 -I$(INCDIR)
+cflags.common	=	-Wall -Wextra -Werror -Wpedantic -pedantic-errors -std=gnu2x -I$(INCDIR)
 cflags.debug	=	-g
 cflags.fsan		=	$(cflags.debug) -fsanitize=address,undefined
 cflags.normal	=	-s -O1
 cflags.extra	=	
 CFLAGS			=	$(cflags.common) $(cflags.$(BUILD)) $(cflags.extra)
+
+LDFLAGS	=	-lpthread -lm
 
 SRCDIR	=	src
 OBJDIR	=	obj
@@ -34,11 +37,16 @@ FILES	=	main.c \
 SRCS	=	$(addprefix $(SRCDIR)/, $(FILES))
 OBJS	=	$(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
 
-all: $(NAME)
+all: $(NAME) $(TEST_CLIENT)
 
 $(NAME): $(OBJDIR) $(OBJS)
-	@printf "\e[38;5;119;1mNETPONG >\e[m Creating %s\n" $@
-	@$(CC) $(CFLAGS) $(OBJS) -o $@
+	@printf "\e[38;5;119;1mNETPONG >\e[m Compiling %s\n" $@
+	@$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) -o $@
+	@printf "\e[38;5;119;1mNETPONG >\e[m \e[1mDone!\e[m\n"
+
+$(TEST_CLIENT): $(SRCDIR)/test_client.c $(SRCDIR)/utils.c
+	@printf "\e[38;5;119;1mNETPONG >\e[m Compiling %s\n" $@
+	@$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 	@printf "\e[38;5;119;1mNETPONG >\e[m \e[1mDone!\e[m\n"
 
 $(OBJDIR):
@@ -55,6 +63,7 @@ clean:
 
 fclean: clean
 	@rm -rf $(OBJDIR)
+	@rm -f $(TEST_CLIENT)
 	@rm -f $(NAME)
 
 re: fclean all

@@ -11,6 +11,7 @@
 
 #include "data.h"
 
+#include <math.h>
 #include <time.h>
 #include <pthread.h>
 
@@ -19,15 +20,24 @@
 
 #define GAME_TICKRATE	1000U
 
-#define GAME_FIELD_WIDTH	80.0f
+#define GAME_FIELD_WIDTH	40.0f
 #define GAME_FIELD_HEIGHT	20.0f
 
 #define	GAME_BALL_RADIUS	0.5f
 #define GAME_PADDLE_HEIGHT	1.5f
-#define GAME_BALL_MAX_ANGLE	45.0f
 
-#define GAME_UPDATE_ALLOWED		1
-#define GAME_UPDATE_FORBIDDEN	0
+#define GAME_BALL_ANGLE_MAX			40.0f
+#define GAME_BALL_ANGLE_MOVE_BOOST	5.0f
+#define GAME_BALL_ANGLE_MULTIPLIER	(GAME_BALL_ANGLE_MAX / GAME_PADDLE_HEIGHT)
+#define GAME_BALL_ANGLE_ABS_MAX		(GAME_BALL_ANGLE_MAX + GAME_BALL_ANGLE_MOVE_BOOST)
+
+#define GAME_BALL_SPEED		0.1f
+#define GAME_PADDLE_SPEED	0.2f
+
+#define GAME_SCORE_MAX	11
+
+#define GAME_UPDATE_ALLOWED			0x1
+#define GAME_UPDATE_SCORE_PENDING	0x2
 
 void	*pong(void *arg);
 
