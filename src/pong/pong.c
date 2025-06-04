@@ -29,18 +29,19 @@ static const char	*direction_strings[] = {
 static inline void	_move_paddles(state *game);
 static inline void	_move_ball(state *game);
 static inline void	_hit_ball(state *game, const u8 player);
-static inline void	_end_game(state *game);
+static inline void	_end_game(state *game, const u8 winner);
 static inline void	_tick(state *game);
 
 void	*pong(void *arg) {
 	struct timespec	start;
 	u8				game_id;
+	u8				quit;
 
 	game_id =((state *)arg)->game_id;
 	games[game_id] = arg;
 	if (clock_gettime(CLOCK_MONOTONIC, &start) == -1)
 		die(strerror(errno));
-	while (1) {
+	for(quit = 0; !quit; check_quit(game_id, games[game_id]->quit, quit)) {
 		_tick(games[game_id]);
 		start.tv_nsec += _TICK_DURATION;
 		if (start.tv_nsec >= _SECOND_NS) {
@@ -56,8 +57,11 @@ void	unpause_game(const u8 game_id, const u8 player) {
 	debug("Game %hhu: Player %hhu unpaused", game_id, player);
 	lock_game(game_id);
 	games[game_id]->pause &= ~player;
-	if (!games[game_id]->pause)
+	if (!games[game_id]->pause) {
 		games[game_id]->update ^= GAME_UPDATE_ALLOWED;
+		if (!games[game_id]->started)
+			games[game_id]->started = 1;
+	}
 	unlock_game(game_id);
 }
 
@@ -67,7 +71,7 @@ void	pause_game(const u8 game_id, const u8 player) {
 	games[game_id]->pause |= player;
 	if (games[game_id]->update & GAME_UPDATE_ALLOWED) {
 		games[game_id]->update ^= GAME_UPDATE_ALLOWED;
-		send_message(game_id, MESSAGE_SERVER_GAME_PAUSED);
+		send_message(game_id, MESSAGE_SERVER_GAME_PAUSED, 0);
 	}
 	unlock_game(game_id);
 }
@@ -83,6 +87,17 @@ void	move_paddle(const u8 game_id, const u8 player, const direction direction) {
 			games[game_id]->p2_paddle.direction = direction;
 			break ;
 	}
+	unlock_game(game_id);
+}
+
+void	quit_game(const u8 game_id, const u8 player) {
+	debug("Game %hhu: Player %hhu quit", game_id, player);
+	lock_game(game_id);
+	if (!player)
+		send_message(game_id, MESSAGE_SERVER_GAME_OVER, MESSAGE_SERVER_GAME_OVER_SERVER_CLOSED << 8 | 0);
+	else if (games[game_id]->started)
+		send_message(game_id, MESSAGE_SERVER_GAME_OVER, (MESSAGE_SERVER_GAME_OVER_ACT_QUIT << 8) | player);
+	games[game_id]->quit = 1;
 	unlock_game(game_id);
 }
 
@@ -194,19 +209,19 @@ static inline void	_hit_ball(state *game, const u8 player) {
 			case GAME_PLAYER_1:
 				game->ball.direction = LEFT;
 				if (++game->score.p2 == GAME_SCORE_MAX)
-					_end_game(game);
+					_end_game(game, GAME_PLAYER_2);
 				break ;
 			case GAME_PLAYER_2:
 				game->ball.direction = RIGHT;
 				if (++game->score.p1 == GAME_SCORE_MAX)
-					_end_game(game);
+					_end_game(game, GAME_PLAYER_1);
 		}
 	}
 }
 
-static inline void	_end_game(state *game) {
-	send_message(game->game_id, MESSAGE_SERVER_STATE_UPDATE);
-	send_message(game->game_id, MESSAGE_SERVER_GAME_OVER);
+static inline void	_end_game(state *game, const u8 winner) {
+	send_message(game->game_id, MESSAGE_SERVER_STATE_UPDATE, 0);
+	send_message(game->game_id, MESSAGE_SERVER_GAME_OVER, (MESSAGE_SERVER_GAME_OVER_SERVER_CLOSED << 8) | winner);
 	*game = (state){
 		.p1_paddle.pos = GAME_FIELD_HEIGHT / 2,
 		.p2_paddle.pos = GAME_FIELD_HEIGHT / 2,
@@ -219,8 +234,10 @@ static inline void	_end_game(state *game) {
 		.score.p1 = 0,
 		.score.p2 = 0,
 		.game_id = game->game_id,
+		.started = 0,
 		.update = 0,
-		.pause = GAME_PLAYER_1 | GAME_PLAYER_2
+		.pause = GAME_PLAYER_1 | GAME_PLAYER_2,
+		.quit = 0
 	};
 }
 

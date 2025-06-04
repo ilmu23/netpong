@@ -31,8 +31,8 @@
 #define GAME_BALL_ANGLE_MULTIPLIER	(GAME_BALL_ANGLE_MAX / GAME_PADDLE_HEIGHT)
 #define GAME_BALL_ANGLE_ABS_MAX		(GAME_BALL_ANGLE_MAX + GAME_BALL_ANGLE_MOVE_BOOST)
 
-#define GAME_BALL_SPEED		0.1f
-#define GAME_PADDLE_SPEED	0.2f
+#define GAME_BALL_SPEED		0.025f
+#define GAME_PADDLE_SPEED	0.05f
 
 #define GAME_SCORE_MAX	11
 
@@ -45,3 +45,5 @@ void	unpause_game(const u8 game_id, const u8 player);
 void	pause_game(const u8 game_id, const u8 player);
 
 void	move_paddle(const u8 game_id, const u8 player, const direction direction);
+
+void	quit_game(const u8 game_id, const u8 player);

@@ -33,9 +33,9 @@ typedef struct __game {
 	i32		epoll_instance;
 }	game;
 
-#if PROTOCOL_VERSION == 0
+#if PROTOCOL_VERSION >= 0
 
-# define MESSAGE_HEADER_SIZE 4
+#define MESSAGE_HEADER_SIZE 4
 
 typedef struct [[gnu::packed]] __message {
 	u8	version;
@@ -49,7 +49,7 @@ typedef struct [[gnu::packed]] __msg_srv_init {
 	u16	p2_port;
 }	msg_srv_init;
 
-#define _msg_srv_init(_p1, _p2) ((msg_srv_init){.p1_port = _p1, .p2_port = _p2})
+#define _msg_srv_init(_p1, _p2)	((msg_srv_init){.p1_port = _p1, .p2_port = _p2})
 
 typedef struct [[gnu::packed]] __msg_srv_state {
 	f32	p1_paddle;
@@ -63,4 +63,16 @@ typedef struct [[gnu::packed]] __msg_srv_state {
 
 #define _msg_srv_state(_p1, _p2, _x, _y, _sc)	((msg_srv_state){.p1_paddle = _p1, .p2_paddle = _p2, .ball.x = _x, .ball.y = _y, .score = (_sc.p1 << 8) | _sc.p2})
 
-#endif /* PROTOCOL_VERSION == 0 */
+#if PROTOCOL_VERSION >= 1
+
+typedef struct [[gnu::packed]] __msg_srv_game_over {
+	u8	actor_id;
+	u8	finish_status;
+	u16	score;
+}	msg_srv_game_over;
+
+#define _msg_srv_game_over(_aid, _fs, _sc)	((msg_srv_game_over){.actor_id = _aid, .finish_status = _fs, .score = (_sc.p1 << 8) | _sc.p2})
+
+#endif /* PROTOCOL_VERSION >= 1 */
+
+#endif /* PROTOCOL_VERSION >= 0 */

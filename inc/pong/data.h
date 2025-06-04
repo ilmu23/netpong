@@ -39,6 +39,8 @@ typedef struct __state {
 		u8	p2;
 	}	score;
 	u8	game_id;
+	u8	started;
 	u8	update;
 	u8	pause;
+	u8	quit;
 }	state;
