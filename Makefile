@@ -33,11 +33,13 @@ INCDIR	=	inc
 
 PONGDIR	=	pong
 SERVDIR	=	server
+VECTDIR	=	vector
 
 FILES	=	main.c \
 			utils.c \
 			$(PONGDIR)/pong.c \
-			$(SERVDIR)/server.c
+			$(SERVDIR)/server.c \
+			$(VECTDIR)/vector.c
 
 SRCS	=	$(addprefix $(SRCDIR)/, $(FILES))
 OBJS	=	$(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
@@ -58,6 +60,7 @@ $(OBJDIR):
 	@printf "\e[38;5;119;1mNETPONG >\e[m Creating objdirs\n"
 	@mkdir -p $(OBJDIR)/$(PONGDIR)
 	@mkdir -p $(OBJDIR)/$(SERVDIR)
+	@mkdir -p $(OBJDIR)/$(VECTDIR)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	@printf "\e[38;5;119;1mNETPONG >\e[m Compiling %s\n" $<
