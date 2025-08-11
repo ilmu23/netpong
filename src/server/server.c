@@ -16,6 +16,7 @@ static pthread_mutex_t	gamelist_lock = PTHREAD_MUTEX_INITIALIZER;
 static const char		*server_message_type_strings[] = {"Game init", "Game paused", "Game over", "State update"};
 static const char		*address;
 static pthread_t		t0;
+static socklen_t		addr_length;
 static size_t			game_count;
 static vector			active_games;
 static u8				___terminate = 0;
@@ -155,7 +156,6 @@ static inline void	_get_message(message *message_buf, const i32 fd) {
 	if (_terminate)
 		pthread_exit(NULL);
 	if (rv == 0) {
-		debug("_get_message: recv returned 0");
 		*message_buf = (message){
 			.version = PROTOCOL_VERSION,
 			.type = MESSAGE_CLIENT_QUIT,
@@ -175,7 +175,6 @@ static inline void	_get_message(message *message_buf, const i32 fd) {
 static inline void	_assign_ports(game *game) {
 	struct epoll_event	events[MAX_EVENTS];
 	struct sockaddr_in	addr;
-	socklen_t			addr_length;
 	i32					event_count;
 	i32					p1_sfd;
 	i32					p2_sfd;
@@ -234,7 +233,7 @@ static inline void	_assign_ports(game *game) {
 }
 
 static inline i32	_open_socket(const char *port) {
-	struct sockaddr_in	*addr;
+	struct sockaddr_in	addr;
 	struct addrinfo		*addresses;
 	struct addrinfo		*cur_address;
 	i32					out;
@@ -248,11 +247,12 @@ static inline i32	_open_socket(const char *port) {
 			if (setsockopt(out, SOL_SOCKET, SO_REUSEADDR, &(i32){1}, sizeof(i32)) == -1)
 				Die();
 			if (bind(out, cur_address->ai_addr, cur_address->ai_addrlen) == 0) {
-				addr = (struct sockaddr_in *)cur_address->ai_addr;
+				addr_length = sizeof(addr);
+				getsockname(out, (struct sockaddr *)&addr, &addr_length);
 				debug("Socket opened and bound to %hhu.%hhu.%hhu.%hhu:%hu",
-					INET_N1(addr->sin_addr.s_addr), INET_N2(addr->sin_addr.s_addr),
-					INET_N3(addr->sin_addr.s_addr), INET_N4(addr->sin_addr.s_addr),
-					ntohs(addr->sin_port));
+					INET_N1(addr.sin_addr.s_addr), INET_N2(addr.sin_addr.s_addr),
+					INET_N3(addr.sin_addr.s_addr), INET_N4(addr.sin_addr.s_addr),
+					ntohs(addr.sin_port));
 				break ;
 			}
 			close(out);
