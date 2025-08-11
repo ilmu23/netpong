@@ -67,9 +67,11 @@ typedef double		f64;
 
 #define SGR_RESET	"\x1b[m"
 
+#define MAX_GAME_COUNT	100
+
 #define PROTOCOL_VERSION	1
 
-#define MAX_GAME_COUNT	100
+#define PLAYER_CONNECT_TIMEOUT	30000U // 30s
 
 #define MESSAGE_CLIENT_START		0
 #define MESSAGE_CLIENT_PAUSE		1

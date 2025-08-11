@@ -33,7 +33,7 @@ static const struct addrinfo	hints = {
 
 #define Die()	(die(strerror(errno)))
 
-#define set_non_blocking(fd)	(fcntl(fd, F_SETFL, O_NONBLOCK))
+#define set_non_blocking(fd)	((fd != -1) ? fcntl(fd, F_SETFL, O_NONBLOCK) : 1)
 
 #define INET_N1(a)	((u8)(ntohl(a) >> 24 & 0xFF))
 #define INET_N2(a)	((u8)(ntohl(a) >> 16 & 0xFF))
@@ -209,7 +209,12 @@ static inline void	_assign_ports(game *game) {
 	game->sockets.p1 = -1;
 	game->sockets.p2 = -1;
 	while (game->sockets.p1 == -1 || game->sockets.p2 == -1) {
-		event_count = epoll_wait(game->epoll_instance, events, MAX_EVENTS, -1);
+		event_count = epoll_wait(game->epoll_instance, events, MAX_EVENTS, PLAYER_CONNECT_TIMEOUT);
+		if (event_count == 0) {
+			warn("Game %hhu: Timed out waiting for players", game->id);
+			game->state.quit = 1;
+			break ;
+		}
 		for (i = 0; i < event_count; i++) {
 			if (events[i].data.fd == p1_sfd && game->sockets.p1 == -1) {
 				game->sockets.p1 = _connect_client(p1_sfd);
@@ -369,6 +374,8 @@ static void	*_run_game(void *arg) {
 			.quit = 0
 		},
 		.threads.game_master = pthread_self(),
+		.threads.game_loop = -1,
+		.threads.player_io = -1,
 		.sockets.state = (i32)(uintptr_t)arg
 	};
 	for (i = 0, size = vector_size(active_games); i < size; i++)
@@ -384,20 +391,22 @@ static void	*_run_game(void *arg) {
 	if (_game.epoll_instance == -1)
 		Die();
 	_assign_ports(&_game);
-	ev = (struct epoll_event){
-		.events = EPOLLIN,
-		.data.fd = _game.sockets.p1
-	};
-	if (epoll_ctl(_game.epoll_instance, EPOLL_CTL_ADD, _game.sockets.p1, &ev) == -1)
-		Die();
-	ev.data.fd = _game.sockets.p2;
-	if (epoll_ctl(_game.epoll_instance, EPOLL_CTL_ADD, _game.sockets.p2, &ev) == -1)
-		Die();
-	debug("Game %hhu: Creating threads", _game.id);
-	if (pthread_create(&_game.threads.game_loop, NULL, pong, &_game) == -1 ||
-		pthread_create(&_game.threads.player_io, NULL, _player_io, &_game) == -1)
-		Die();
-	for (tmp = 0; !tmp; check_quit(_game.state, tmp)) {
+	if (!_game.state.quit) {
+		ev = (struct epoll_event){
+			.events = EPOLLIN,
+				.data.fd = _game.sockets.p1
+		};
+		if (epoll_ctl(_game.epoll_instance, EPOLL_CTL_ADD, _game.sockets.p1, &ev) == -1)
+			Die();
+		ev.data.fd = _game.sockets.p2;
+		if (epoll_ctl(_game.epoll_instance, EPOLL_CTL_ADD, _game.sockets.p2, &ev) == -1)
+			Die();
+		debug("Game %hhu: Creating threads", _game.id);
+		if (pthread_create(&_game.threads.game_loop, NULL, pong, &_game) == -1 ||
+				pthread_create(&_game.threads.player_io, NULL, _player_io, &_game) == -1)
+			Die();
+	}
+	for (check_quit(_game.state, tmp); !tmp; check_quit(_game.state, tmp)) {
 		lock_game(_game.state);
 		if (_game.state.update & GAME_UPDATE_ALLOWED) {
 			send_message(&_game, MESSAGE_SERVER_STATE_UPDATE, 0);
@@ -408,19 +417,25 @@ static void	*_run_game(void *arg) {
 	}
 	lock_game(_game.state);
 	debug("Game %1$hhu: Starting cleanup\nGame %1$hhu: Joining player IO thread", _game.id);
-	pthread_cancel(_game.threads.player_io);
-	pthread_join(_game.threads.player_io, NULL);
+	if (!pthread_equal(_game.threads.player_io, -1)) {
+		pthread_cancel(_game.threads.player_io);
+		pthread_join(_game.threads.player_io, NULL);
+	}
 	debug("Game %hhu: Joining game thread", _game.id);
-	pthread_cancel(_game.threads.game_loop);
-	pthread_join(_game.threads.game_loop, NULL);
+	if (!pthread_equal(_game.threads.game_loop, -1)) {
+		pthread_cancel(_game.threads.game_loop);
+		pthread_join(_game.threads.game_loop, NULL);
+	}
 	unlock_game(_game.state);
 	pthread_mutex_destroy(&_game.state.lock);
 	debug("Game %hhu: Destroying epoll instance", _game.id);
 	close(_game.epoll_instance);
 	debug("Game %hhu: Closing sockets", _game.id);
 	close(_game.sockets.state);
-	close(_game.sockets.p2);
-	close(_game.sockets.p1);
+	if (_game.sockets.p2 != -1)
+		close(_game.sockets.p2);
+	if (_game.sockets.p1 != -1)
+		close(_game.sockets.p1);
 	pthread_mutex_lock(&gamelist_lock);
 	for (i = 0; i < vector_size(active_games); i++) {
 		if ((*(game **)vector_get(active_games, i))->id == _game.id) {
