@@ -10,6 +10,7 @@
 #pragma once
 
 #include "data.h"
+#include "server/server.h"
 
 #include <math.h>
 #include <time.h>
@@ -41,9 +42,9 @@
 
 void	*pong(void *arg);
 
-void	unpause_game(const u8 game_id, const u8 player);
-void	pause_game(const u8 game_id, const u8 player);
+void	unpause_game(game *game, const u8 player);
+void	pause_game(game *game, const u8 player);
 
-void	move_paddle(const u8 game_id, const u8 player, const direction direction);
+void	move_paddle(game *game, const u8 player, const direction direction);
 
-void	quit_game(const u8 game_id, const u8 player);
+void	quit_game(game *game, const u8 player);

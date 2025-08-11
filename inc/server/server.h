@@ -8,7 +8,7 @@
 // <<server.h>>
 
 #include "data.h"
-#include "utils.h"
+#include "utils/misc.h"
 
 #include <errno.h>
 #include <fcntl.h>
@@ -35,4 +35,4 @@
 
 [[gnu::noreturn]] void	run_server(const char *address, const char *port);
 
-void	send_message(const u8 game_id, const u8 message_type, const uintptr_t arg);
+void	send_message(const game *game, const u8 message_type, const uintptr_t arg);

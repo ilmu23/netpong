@@ -33,11 +33,13 @@ INCDIR	=	inc
 
 PONGDIR	=	pong
 SERVDIR	=	server
+UTILDIR	=	utils
 
 FILES	=	main.c \
-			utils.c \
 			$(PONGDIR)/pong.c \
-			$(SERVDIR)/server.c
+			$(SERVDIR)/server.c \
+			$(UTILDIR)/misc.c \
+			$(UTILDIR)/vector.c
 
 SRCS	=	$(addprefix $(SRCDIR)/, $(FILES))
 OBJS	=	$(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
@@ -49,7 +51,7 @@ $(NAME): $(OBJDIR) $(OBJS)
 	@$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) -o $@
 	@printf "\e[38;5;119;1mNETPONG >\e[m \e[1mDone!\e[m\n"
 
-$(TEST_CLIENT): $(SRCDIR)/test_client.c $(SRCDIR)/utils.c
+$(TEST_CLIENT): $(SRCDIR)/test_client.c $(SRCDIR)/$(UTILDIR)/misc.c
 	@printf "\e[38;5;119;1mNETPONG >\e[m Compiling %s\n" $@
 	@$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 	@printf "\e[38;5;119;1mNETPONG >\e[m \e[1mDone!\e[m\n"
@@ -58,6 +60,7 @@ $(OBJDIR):
 	@printf "\e[38;5;119;1mNETPONG >\e[m Creating objdirs\n"
 	@mkdir -p $(OBJDIR)/$(PONGDIR)
 	@mkdir -p $(OBJDIR)/$(SERVDIR)
+	@mkdir -p $(OBJDIR)/$(UTILDIR)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	@printf "\e[38;5;119;1mNETPONG >\e[m Compiling %s\n" $<

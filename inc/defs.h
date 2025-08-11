@@ -24,10 +24,10 @@ typedef	uint64_t	u64;
 typedef float		f32;
 typedef double		f64;
 
-#define lock_game(game_id)		(pthread_mutex_lock(&state_locks[game_id]))
-#define unlock_game(game_id)	(pthread_mutex_unlock(&state_locks[game_id]))
+#define lock_game(game_state)	(pthread_mutex_lock(&(game_state).lock))
+#define unlock_game(game_state)	(pthread_mutex_unlock(&(game_state).lock))
 
-#define check_quit(game_id, quit, res)	(lock_game(game_id), res = quit, unlock_game(game_id))
+#define check_quit(game_state, res)	(lock_game(game_state), res = (game_state).quit, unlock_game(game_state))
 
 #define	rand_range(min, max)	(rand() % (max - min + 1) + min)
 

@@ -11,6 +11,8 @@
 
 #include "defs.h"
 
+#include <pthread.h>
+
 typedef enum __direction {
 	UP = 0,
 	DOWN = 1,
@@ -20,6 +22,7 @@ typedef enum __direction {
 }	direction;
 
 typedef struct __state {
+	pthread_mutex_t	lock;
 	struct {
 		f32			pos;
 		direction	direction;
@@ -38,7 +41,6 @@ typedef struct __state {
 		u8	p1;
 		u8	p2;
 	}	score;
-	u8	game_id;
 	u8	started;
 	u8	update;
 	u8	pause;

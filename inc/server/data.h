@@ -15,22 +15,23 @@
 #include <pthread.h>
 
 typedef struct __game {
+	state	state;
 	struct {
 		pthread_t	game_master;
 		pthread_t	game_loop;
 		pthread_t	player_io;
-	}		threads;
-	state	state;
+	}	threads;
 	struct {
 		i32	state;
 		i32	p1;
 		i32	p2;
-	}		sockets;
+	}	sockets;
 	struct {
 		u16	p1;
 		u16	p2;
-	}		ports;
-	i32		epoll_instance;
+	}	ports;
+	i32	epoll_instance;
+	u8	id;
 }	game;
 
 #if PROTOCOL_VERSION >= 0

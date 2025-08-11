@@ -5,9 +5,9 @@
 // ██║        ██║███████╗██║     ╚██████╔╝   ██║   ╚██████╗██║  ██║██║  ██║██║  ██║
 // ╚═╝        ╚═╝╚══════╝╚═╝      ╚═════╝    ╚═╝    ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝
 //
-// <<utils.c>>
+// <<misc.c>>
 
-#include "utils.h"
+#include "utils/misc.h"
 
 static inline void	_print_message(const char *fmt, va_list args, const char *sgr);
 
