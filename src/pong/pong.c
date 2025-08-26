@@ -136,7 +136,7 @@ static inline void	_move_ball(game *game) {
 	f32	dy;
 
 	if (game->state.ball.angle >= 0.1 || game->state.ball.angle <= -0.1) {
-		angle_rad = fabsf(game->state.ball.angle) * 3.14 * 2 / 360;
+		angle_rad = fabsf(game->state.ball.angle) * M_PI * 2 / 360;
 		dx = cosf(angle_rad) * GAME_BALL_SPEED;
 		dy = sinf(angle_rad) * GAME_BALL_SPEED;
 		if (game->state.ball.direction == LEFT)
