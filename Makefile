@@ -8,7 +8,6 @@
 ## <<Makefile>>
 
 NAME		=	netpong_server
-TEST_CLIENT	=	test_client
 
 BUILD	=	fsan
 ifeq ("$(BUILD)", "normal")
@@ -44,16 +43,11 @@ FILES	=	main.c \
 SRCS	=	$(addprefix $(SRCDIR)/, $(FILES))
 OBJS	=	$(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
 
-all: $(NAME) $(TEST_CLIENT)
+all: $(NAME)
 
 $(NAME): $(OBJDIR) $(OBJS)
 	@printf "\e[38;5;119;1mNETPONG >\e[m Compiling %s\n" $@
 	@$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) -o $@
-	@printf "\e[38;5;119;1mNETPONG >\e[m \e[1mDone!\e[m\n"
-
-$(TEST_CLIENT): $(SRCDIR)/test_client.c $(SRCDIR)/$(UTILDIR)/misc.c
-	@printf "\e[38;5;119;1mNETPONG >\e[m Compiling %s\n" $@
-	@$(CC) $(CFLAGS) $^ $(LDFLAGS) -o $@
 	@printf "\e[38;5;119;1mNETPONG >\e[m \e[1mDone!\e[m\n"
 
 $(OBJDIR):
