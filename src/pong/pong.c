@@ -180,6 +180,8 @@ static inline void	_hit_ball(game *game, const u8 player) {
 		}
 	} else {
 		game->state.update ^= GAME_UPDATE_SCORE_PENDING;
+		game->state.p1_paddle.pos = GAME_FIELD_HEIGHT / 2;
+		game->state.p2_paddle.pos = GAME_FIELD_HEIGHT / 2;
 		game->state.ball.x = GAME_FIELD_WIDTH / 2;
 		game->state.ball.y = GAME_FIELD_HEIGHT / 2;
 		game->state.ball.angle = 0.0f;
