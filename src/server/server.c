@@ -391,7 +391,7 @@ static void	*_run_game(void *arg) {
 	if (!_game.state.quit) {
 		ev = (struct epoll_event){
 			.events = EPOLLIN,
-				.data.fd = _game.sockets.p1
+			.data.fd = _game.sockets.p1
 		};
 		if (epoll_ctl(_game.epoll_instance, EPOLL_CTL_ADD, _game.sockets.p1, &ev) == -1)
 			Die();
@@ -400,7 +400,7 @@ static void	*_run_game(void *arg) {
 			Die();
 		debug("Game %hhu: Creating threads", _game.id);
 		if (pthread_create(&_game.threads.game_loop, NULL, pong, &_game) == -1 ||
-				pthread_create(&_game.threads.player_io, NULL, _player_io, &_game) == -1)
+			pthread_create(&_game.threads.player_io, NULL, _player_io, &_game) == -1)
 			Die();
 	}
 	for (check_quit(_game.state, tmp); !tmp; check_quit(_game.state, tmp)) {
