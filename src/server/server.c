@@ -11,15 +11,16 @@
 #include "server/server.h"
 #include "utils/vector.h"
 
-static pthread_mutex_t	___terminate_lock = PTHREAD_MUTEX_INITIALIZER;
+#define atomic _Atomic
+
 static pthread_mutex_t	gamelist_lock = PTHREAD_MUTEX_INITIALIZER;
 static const char		*server_message_type_strings[] = {"Game init", "Game paused", "Game over", "State update"};
 static const char		*address;
 static pthread_t		t0;
 static socklen_t		addr_length;
-static size_t			game_count;
+static atomic u8		___terminate = 0;
 static vector			active_games;
-static u8				___terminate = 0;
+static size_t			game_count;
 
 static const struct addrinfo	hints = {
 	.ai_family = AF_INET,
@@ -115,9 +116,7 @@ void	send_message(const game *game, const u8 message_type, const uintptr_t arg) 
 }
 
 static inline void	_sigint_handle([[gnu::unused]] const i32 signum) {
-	pthread_mutex_lock(&___terminate_lock);
 	___terminate = 1;
-	pthread_mutex_unlock(&___terminate_lock);
 }
 
 static inline void	_terminate(const vector main_threads) {
@@ -150,9 +149,7 @@ static inline void	_get_message(message *msg, const i32 fd) {
 	u8		_terminate;
 
 	rv = recv(fd, msg, MESSAGE_HEADER_SIZE, MSG_WAITALL);
-	pthread_mutex_lock(&___terminate_lock);
 	_terminate = ___terminate;
-	pthread_mutex_unlock(&___terminate_lock);
 	if (_terminate)
 		pthread_exit(NULL);
 	if (rv == 0) {
