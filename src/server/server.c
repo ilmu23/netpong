@@ -43,7 +43,7 @@ static const struct addrinfo	hints = {
 static inline void	_sigint_handle([[gnu::unused]] const i32 signum);
 static inline void	_terminate(const vector main_threads);
 static inline void	_host_game(const i32 cfd, vector main_threads);
-static inline void	_get_message(message *message_buf, const i32 fd);
+static inline void	_get_message(message *msg, const i32 fd);
 static inline void	_assign_ports(game *game);
 static inline i32	_open_socket(const char *port);
 static inline i32	_connect_client(const i32 lfd);
@@ -145,18 +145,18 @@ static inline void	_host_game(const i32 cfd, vector main_threads) {
 		Die();
 }
 
-static inline void	_get_message(message *message_buf, const i32 fd) {
+static inline void	_get_message(message *msg, const i32 fd) {
 	ssize_t	rv;
 	u8		_terminate;
 
-	rv = recv(fd, message_buf, MESSAGE_HEADER_SIZE, MSG_WAITALL);
+	rv = recv(fd, msg, MESSAGE_HEADER_SIZE, MSG_WAITALL);
 	pthread_mutex_lock(&___terminate_lock);
 	_terminate = ___terminate;
 	pthread_mutex_unlock(&___terminate_lock);
 	if (_terminate)
 		pthread_exit(NULL);
 	if (rv == 0) {
-		*message_buf = (message){
+		*msg = (message){
 			.version = PROTOCOL_VERSION,
 			.type = MESSAGE_CLIENT_QUIT,
 			.length = 0,
@@ -165,9 +165,9 @@ static inline void	_get_message(message *message_buf, const i32 fd) {
 	}
 	if (rv != MESSAGE_HEADER_SIZE)
 		Die();
-	if (message_buf->length) {
-		rv = recv(fd, message_buf->body, message_buf->length, MSG_WAITALL);
-		if (rv != message_buf->length)
+	if (msg->length) {
+		rv = recv(fd, msg->body, (msg->length <= sizeof(msg->body)) ? msg->length : sizeof(msg->body), MSG_WAITALL);
+		if (rv != msg->length)
 			Die();
 	}
 }
