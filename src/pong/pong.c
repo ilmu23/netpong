@@ -13,6 +13,8 @@
 #define _SECOND_NS		1000000000U
 #define _TICK_DURATION	_SECOND_NS / GAME_TICKRATE
 
+#define deg_to_rad(deg)	(deg * M_PI * 2 / 360)
+
 #define paddle_boost(paddle)	((paddle.direction == UP) ? GAME_BALL_ANGLE_MOVE_BOOST : (paddle.direction == DOWN) ? -GAME_BALL_ANGLE_MOVE_BOOST : 0)
 
 static const char	*direction_strings[] = {"Up", "Down", "Left", "Right", "Stop"};
@@ -136,7 +138,7 @@ static inline void	_move_ball(game *game) {
 	f32	dy;
 
 	if (game->state.ball.angle >= 0.1 || game->state.ball.angle <= -0.1) {
-		angle_rad = fabsf(game->state.ball.angle) * M_PI * 2 / 360;
+		angle_rad = deg_to_rad(fabsf(game->state.ball.angle));
 		dx = cosf(angle_rad) * GAME_BALL_SPEED;
 		dy = sinf(angle_rad) * GAME_BALL_SPEED;
 		if (game->state.ball.direction == LEFT)
