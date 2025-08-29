@@ -307,6 +307,10 @@ static void	*_player_io(void *arg) {
 			debug("Game %hhu: New message received from player %hhu", game->id, player);
 			message = &messages[(player == GAME_PLAYER_1) ? 0 : 1];
 			_get_message(message, events[i].data.fd);
+			if (message->version != PROTOCOL_VERSION) {
+				quit_game(game, 0);
+				return NULL;
+			}
 			switch (message->type) {
 				case MESSAGE_CLIENT_START:
 					unpause_game(game, player);
